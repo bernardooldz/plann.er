@@ -1,0 +1,97 @@
+.rdp {
+  --rdp-cell-size: 40px;
+  --rdp-accent-color: #84cc16;
+  --rdp-background-color: #18181b;
+  --rdp-accent-color-dark: #365314;
+  --rdp-background-color-dark: #18181b;
+  --rdp-outline: 2px solid var(--rdp-accent-color);
+  --rdp-outline-selected: 2px solid var(--rdp-accent-color);
+  color: #f4f4f5;
+}
+
+.rdp-months {
+  display: flex;
+}
+
+.rdp-month {
+  margin: 0 1rem;
+}
+
+.rdp-caption {
+  color: #f4f4f5;
+  margin-bottom: 1rem;
+}
+
+.rdp-nav {
+  color: #a1a1aa;
+}
+
+.rdp-nav_button {
+  color: #a1a1aa;
+  background: transparent;
+  border: none;
+}
+
+.rdp-nav_button:hover {
+  color: #f4f4f5;
+  background: #27272a;
+}
+
+.rdp-table {
+  color: #f4f4f5;
+}
+
+.rdp-head_cell {
+  color: #a1a1aa;
+  font-weight: 500;
+}
+
+.rdp-day {
+  color: #f4f4f5;
+  background: transparent;
+  border: none;
+}
+
+.rdp-day:hover {
+  background: #27272a;
+  color: #f4f4f5;
+}
+
+.rdp-day_today {
+  background: #27272a;
+  color: #84cc16;
+  font-weight: 600;
+}
+
+.rdp-day_selected {
+  background: #84cc16;
+  color: #365314;
+  font-weight: 600;
+}
+
+.rdp-day_selected:hover {
+  background: #84cc16;
+  color: #365314;
+}
+
+.rdp-day_range_start,
+.rdp-day_range_end {
+  background: #84cc16;
+  color: #365314;
+  font-weight: 600;
+}
+
+.rdp-day_range_middle {
+  background: #3f3f46;
+  color: #f4f4f5;
+}
+
+.rdp-day_outside {
+  color: #52525b;
+  opacity: 0.5;
+}
+
+.rdp-day_disabled {
+  color: #52525b;
+  opacity: 0.3;
+}
