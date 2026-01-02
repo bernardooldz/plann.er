@@ -8,14 +8,6 @@ import { format } from "date-fns";
 import "react-day-picker/dist/style.css";
 import "./date-picker.css";
 
-interface Trip {
-  id: string;
-  destination: string;
-  starts_at: string;
-  ends_at: string;
-  is_confirmed: boolean;
-}
-
 interface UpdateTripModalProps {
   closeUpdateTripModal: () => void;
   onTripUpdated?: () => void;
@@ -23,7 +15,6 @@ interface UpdateTripModalProps {
 
 export function UpdateTripModal({ closeUpdateTripModal, onTripUpdated }: UpdateTripModalProps) {
   const { tripId } = useParams();
-  const [trip, setTrip] = useState<Trip | undefined>();
   const [destination, setDestination] = useState("");
   const [eventStartAndEndDates, setEventStartAndEndDates] = useState<DateRange | undefined>();
   const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
@@ -31,7 +22,6 @@ export function UpdateTripModal({ closeUpdateTripModal, onTripUpdated }: UpdateT
   useEffect(() => {
     api.get(`/trips/${tripId}`).then((response) => {
       const tripData = response.data.trip;
-      setTrip(tripData);
       setDestination(tripData.destination);
       setEventStartAndEndDates({
         from: new Date(tripData.starts_at),
