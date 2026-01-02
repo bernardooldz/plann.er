@@ -1,8 +1,11 @@
 import { FastifyInstance } from "fastify";
 import { z } from "zod";
+import nodemailer from "nodemailer";
 import { prisma } from "../lib/prisma";
 import { dayjs } from "../lib/dayjs";
 import { ClientError } from "../errors/client-error";
+import { env } from "../env";
+import { getEmailClient } from "../lib/mail";
 
 export async function updateTrip(app: FastifyInstance) {
   app.put("/trips/:tripId", async (request) => {
@@ -22,6 +25,9 @@ export async function updateTrip(app: FastifyInstance) {
 
     const trip = await prisma.trip.findUnique({
       where: { id: tripId },
+      include: {
+        participants: true,
+      },
     });
 
     if (!trip) {
@@ -36,7 +42,7 @@ export async function updateTrip(app: FastifyInstance) {
       throw new ClientError("Invalid trip end date.");
     }
 
-    await prisma.trip.update({
+    const updatedTrip = await prisma.trip.update({
       where: { id: tripId },
       data: {
         destination,
@@ -45,6 +51,56 @@ export async function updateTrip(app: FastifyInstance) {
       },
     });
 
-    return { tripId: trip.id };
+    const formattedStartDate = dayjs(starts_at).format("LL");
+    const formattedEndDate = dayjs(ends_at).format("LL");
+
+    const tripDetailsLink = `${env.WEB_BASE_URL}/trips/${trip.id}`;
+
+    const mail = await getEmailClient();
+
+    const emailPromises = trip.participants.map(async (participant) => {
+      const message = await mail.sendMail({
+        from: {
+          name: "Equipe plann.er",
+          address: "oi@plann.er",
+        },
+        to: {
+          name: participant.name || participant.email,
+          address: participant.email,
+        },
+        subject: `Viagem atualizada: ${destination}`,
+        html: `
+          <div style="font-family: sans-serif; font-size: 16px; line-height: 1.6;">
+            <p>Olá!</p>
+            <p>A viagem para <strong>${destination}</strong> foi atualizada.</p>
+            <p><strong>Novas datas:</strong> ${formattedStartDate} até ${formattedEndDate}</p>
+            <p></p>
+            <p>Para ver todos os detalhes da viagem, clique no link abaixo:</p>
+            <p></p>
+            <p>
+              <a href="${tripDetailsLink}">Ver detalhes da viagem</a>
+            </p>
+            <p></p>
+            <p>Equipe plann.er</p>
+          </div>
+        `.trim(),
+      });
+      
+      console.log(nodemailer.getTestMessageUrl(message));
+      return message;
+    });
+
+    await Promise.all(emailPromises);
+
+    return { 
+      tripId: trip.id,
+      trip: {
+        id: updatedTrip.id,
+        destination: updatedTrip.destination,
+        starts_at: updatedTrip.starts_at,
+        ends_at: updatedTrip.ends_at,
+        is_confirmed: updatedTrip.is_confirmed
+      }
+    };
   });
 }
