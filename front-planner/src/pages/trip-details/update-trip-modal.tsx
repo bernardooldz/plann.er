@@ -10,10 +10,9 @@ import "./date-picker.css";
 
 interface UpdateTripModalProps {
   closeUpdateTripModal: () => void;
-  onTripUpdated?: () => void;
 }
 
-export function UpdateTripModal({ closeUpdateTripModal, onTripUpdated }: UpdateTripModalProps) {
+export function UpdateTripModal({ closeUpdateTripModal }: UpdateTripModalProps) {
   const { tripId } = useParams();
   const [destination, setDestination] = useState("");
   const [eventStartAndEndDates, setEventStartAndEndDates] = useState<DateRange | undefined>();
@@ -41,8 +40,7 @@ export function UpdateTripModal({ closeUpdateTripModal, onTripUpdated }: UpdateT
       ends_at: eventStartAndEndDates.to,
     });
 
-    closeUpdateTripModal();
-    onTripUpdated?.();
+    window.document.location.reload();
   }
 
   return (
