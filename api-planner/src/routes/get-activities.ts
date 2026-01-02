@@ -33,7 +33,7 @@ export async function getActivities(app: FastifyInstance) {
     );
 
     const activities = Array.from({
-      length: differenceInDaysBetweenTripStartAndEnd + 2,
+      length: differenceInDaysBetweenTripStartAndEnd + 1,
     }).map((_, index) => {
       const date = dayjs(trip.starts_at).add(index, "days");
 
