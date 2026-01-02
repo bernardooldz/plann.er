@@ -5,10 +5,12 @@ import { ImportantLinks } from "./important-links";
 import { Guests } from "./guests";
 import { Activities } from "./activities";
 import { DestinationAndDateHeader } from "./destination-and-date-header";
+import { UpdateTripModal } from "./update-trip-modal";
 
 export function TripDetailsPage() {
-  const [isCreateActivityModalOpen, setIsCreateActivityModalOpen] =
-    useState(false);
+  const [isCreateActivityModalOpen, setIsCreateActivityModalOpen] = useState(false);
+  const [isUpdateTripModalOpen, setIsUpdateTripModalOpen] = useState(false);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   function openCreateActivityModal() {
     setIsCreateActivityModalOpen(true);
@@ -18,9 +20,21 @@ export function TripDetailsPage() {
     setIsCreateActivityModalOpen(false);
   }
 
+  function openUpdateTripModal() {
+    setIsUpdateTripModalOpen(true);
+  }
+
+  function closeUpdateTripModal() {
+    setIsUpdateTripModalOpen(false);
+  }
+
+  function handleTripUpdated() {
+    setRefreshKey(prev => prev + 1);
+  }
+
   return (
     <div className="max-w-6xl px-6 py-10 mx-auto space-y-8">
-      <DestinationAndDateHeader />
+      <DestinationAndDateHeader key={refreshKey} openUpdateTripModal={openUpdateTripModal} />
 
       <main className="flex gap-16 px-6">
         <div className="flex-1 space-y-6">
@@ -50,6 +64,13 @@ export function TripDetailsPage() {
       {isCreateActivityModalOpen && (
         <CreateActivityModal
           closeCreateActivityModal={closeCreateActivityModal}
+        />
+      )}
+
+      {isUpdateTripModalOpen && (
+        <UpdateTripModal 
+          closeUpdateTripModal={closeUpdateTripModal} 
+          onTripUpdated={handleTripUpdated}
         />
       )}
     </div>
