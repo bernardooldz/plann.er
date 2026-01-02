@@ -15,7 +15,6 @@ interface Trip {
 
 interface DestinationAndDateHeaderProps {
   openUpdateTripModal: () => void;
-  refreshTrip?: () => void;
 }
 
 export function DestinationAndDateHeader({openUpdateTripModal} : DestinationAndDateHeaderProps) {

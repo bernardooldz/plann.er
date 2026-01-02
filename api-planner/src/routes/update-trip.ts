@@ -42,7 +42,7 @@ export async function updateTrip(app: FastifyInstance) {
       throw new ClientError("Invalid trip end date.");
     }
 
-    await prisma.trip.update({
+    const updatedTrip = await prisma.trip.update({
       where: { id: tripId },
       data: {
         destination,
@@ -90,9 +90,17 @@ export async function updateTrip(app: FastifyInstance) {
       return message;
     });
 
-    // Aguardar todos os emails serem enviados
     await Promise.all(emailPromises);
 
-    return { tripId: trip.id };
+    return { 
+      tripId: trip.id,
+      trip: {
+        id: updatedTrip.id,
+        destination: updatedTrip.destination,
+        starts_at: updatedTrip.starts_at,
+        ends_at: updatedTrip.ends_at,
+        is_confirmed: updatedTrip.is_confirmed
+      }
+    };
   });
 }
