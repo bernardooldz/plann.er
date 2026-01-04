@@ -6,9 +6,11 @@ import { Guests } from "./guests";
 import { Activities } from "./activities";
 import { DestinationAndDateHeader } from "./destination-and-date-header";
 import { UpdateTripModal } from "./update-trip-modal";
+import { CreateLinkModal } from "./create-link";
 
 export function TripDetailsPage() {
   const [isCreateActivityModalOpen, setIsCreateActivityModalOpen] = useState(false);
+  const [isCreateLinkModalOpen, setIsCreateLinkModalOpen] = useState(false);
   const [isUpdateTripModalOpen, setIsUpdateTripModalOpen] = useState(false);
 
   function openCreateActivityModal() {
@@ -17,6 +19,14 @@ export function TripDetailsPage() {
 
   function closeCreateActivityModal() {
     setIsCreateActivityModalOpen(false);
+  }
+
+  function openCreateLinkModal() {
+    setIsCreateLinkModalOpen(true);
+  }
+
+  function closeCreateLinkModal() {
+    setIsCreateLinkModalOpen(false);
   }
 
   function openUpdateTripModal() {
@@ -48,7 +58,7 @@ export function TripDetailsPage() {
         </div>
 
         <div className="w-80 space-y-6">
-          <ImportantLinks />
+          <ImportantLinks openCreateLinkModal={openCreateLinkModal}/>
 
           <div className="w-full h-px bg-zinc-800" />
 
@@ -62,10 +72,12 @@ export function TripDetailsPage() {
         />
       )}
 
+      {isCreateLinkModalOpen && (
+        <CreateLinkModal closeCreateLinkModal={closeCreateLinkModal} />
+      )}
+
       {isUpdateTripModalOpen && (
-        <UpdateTripModal 
-          closeUpdateTripModal={closeUpdateTripModal}
-        />
+        <UpdateTripModal closeUpdateTripModal={closeUpdateTripModal} />
       )}
     </div>
   );
