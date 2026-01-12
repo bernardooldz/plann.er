@@ -1,0 +1,159 @@
+import { X, AtSign, Plus, Loader2 } from "lucide-react";
+import { FormEvent, useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+import { Button } from "../../components/button";
+import { api } from "../../lib/axios";
+
+interface Participant {
+  id: string;
+  name: string | null;
+  email: string;
+  is_confirmed: boolean;
+}
+
+interface ManageGuestsModalProps {
+  closeManageGuestsModal: () => void;
+  onGuestsUpdated: () => void;
+}
+
+export function ManageGuestsModal({
+  closeManageGuestsModal,
+  onGuestsUpdated,
+}: ManageGuestsModalProps) {
+  const { tripId } = useParams();
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [emailsToInvite, setEmailsToInvite] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasChanges, setHasChanges] = useState(false);
+
+  useEffect(() => {
+    api
+      .get(`/trips/${tripId}/participants`)
+      .then((response) => {
+        setParticipants(response.data.participants);
+        setEmailsToInvite(response.data.participants.map((p: Participant) => p.email));
+      })
+      .catch((error) => {
+        console.error('Error loading participants:', error);
+      });
+  }, [tripId]);
+
+  async function addNewEmailToInvite(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    const email = data.get("email")?.toString();
+
+    if (!email) return;
+    if (emailsToInvite.includes(email)) return;
+
+    setEmailsToInvite([...emailsToInvite, email]);
+    setHasChanges(true);
+    event.currentTarget.reset();
+  }
+
+  function removeEmailFromInvites(emailToRemove: string) {
+    setEmailsToInvite(emailsToInvite.filter((email) => email !== emailToRemove));
+    const currentEmails = participants.map(p => p.email);
+    const remainingEmails = emailsToInvite.filter((email) => email !== emailToRemove);
+    setHasChanges(remainingEmails.some(email => !currentEmails.includes(email)));
+  }
+
+  async function saveGuestChanges() {
+    setIsLoading(true);
+    try {
+      const currentEmails = participants.map(p => p.email);
+      const emailsToAdd = emailsToInvite.filter(email => !currentEmails.includes(email));
+
+      // Add new participants one by one
+      for (const email of emailsToAdd) {
+        await api.post(`/trips/${tripId}/invites`, {
+          email: email,
+        });
+      }
+
+      onGuestsUpdated();
+      closeManageGuestsModal();
+    } catch (error) {
+      console.error("Erro ao salvar alterações:", error);
+      alert("Erro ao salvar alterações. Tente novamente.");
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 bg-black/60 flex items-center justify-center">
+      <div className="w-160 rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <h2 className="font-semibold text-lg">Gerenciar convidados</h2>
+            <button onClick={closeManageGuestsModal}>
+              <X className="size-5 text-zinc-400" />
+            </button>
+          </div>
+          <p className="text-sm text-zinc-400">
+            Adicione novos convidados à viagem. Para remover participantes, entre em contato com o administrador.
+          </p>
+        </div>
+
+        <div className="flex flex-wrap gap-2">
+          {emailsToInvite.map((email) => {
+            return (
+              <div
+                key={email}
+                className="py-1.5 px-2.5 rounded-md bg-zinc-800 flex items-center gap-2"
+              >
+                <span className="text-zinc-300">{email}</span>
+                <button
+                  type="button"
+                  onClick={() => removeEmailFromInvites(email)}
+                >
+                  <X className="size-4 text-zinc-400" />
+                </button>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className="w-full h-px bg-zinc-800"></div>
+
+        <form
+          onSubmit={addNewEmailToInvite}
+          className="p-2.5 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center gap-2"
+        >
+          <div className="px-2 flex items-center flex-1 gap-2">
+            <AtSign className="size-5 text-zinc-400" />
+            <input
+              type="email"
+              name="email"
+              placeholder="Digite o email do convidado"
+              className="bg-transparent text-md placeholder-zinc-400 outline-none flex-1"
+            />
+          </div>
+
+          <Button type="submit">
+            Convidar
+            <Plus className="size-5 text-lime-950" />
+          </Button>
+        </form>
+
+        {hasChanges && (
+          <div className="text-sm text-lime-400 bg-lime-400/10 p-2 rounded-md">
+            ✓ Novos convidados adicionados. Clique em "Salvar alterações" para enviar os convites.
+          </div>
+        )}
+
+        <Button onClick={saveGuestChanges} size="full" disabled={isLoading || !hasChanges}>
+          {isLoading ? (
+            <>
+              <Loader2 className="size-5 animate-spin" />
+              Salvando...
+            </>
+          ) : (
+            "Salvar alterações"
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+}

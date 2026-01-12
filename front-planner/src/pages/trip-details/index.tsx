@@ -7,11 +7,14 @@ import { Activities } from "./activities";
 import { DestinationAndDateHeader } from "./destination-and-date-header";
 import { UpdateTripModal } from "./update-trip-modal";
 import { CreateLinkModal } from "./create-link";
+import { ManageGuestsModal } from "./manage-guests-modal";
 
 export function TripDetailsPage() {
   const [isCreateActivityModalOpen, setIsCreateActivityModalOpen] = useState(false);
   const [isCreateLinkModalOpen, setIsCreateLinkModalOpen] = useState(false);
   const [isUpdateTripModalOpen, setIsUpdateTripModalOpen] = useState(false);
+  const [isManageGuestsModalOpen, setIsManageGuestsModalOpen] = useState(false);
+  const [guestsKey, setGuestsKey] = useState(0);
 
   function openCreateActivityModal() {
     setIsCreateActivityModalOpen(true);
@@ -33,8 +36,16 @@ export function TripDetailsPage() {
     setIsUpdateTripModalOpen(true);
   }
 
-  function closeUpdateTripModal() {
-    setIsUpdateTripModalOpen(false);
+  function openManageGuestsModal() {
+    setIsManageGuestsModalOpen(true);
+  }
+
+  function closeManageGuestsModal() {
+    setIsManageGuestsModalOpen(false);
+  }
+
+  function handleGuestsUpdated() {
+    setGuestsKey(prev => prev + 1);
   }
 
   return (
@@ -62,7 +73,7 @@ export function TripDetailsPage() {
 
           <div className="w-full h-px bg-zinc-800" />
 
-          <Guests />
+          <Guests key={guestsKey} openManageGuestsModal={openManageGuestsModal} />
         </div>
       </main>
 
@@ -78,6 +89,13 @@ export function TripDetailsPage() {
 
       {isUpdateTripModalOpen && (
         <UpdateTripModal closeUpdateTripModal={closeUpdateTripModal} />
+      )}
+
+      {isManageGuestsModalOpen && (
+        <ManageGuestsModal 
+          closeManageGuestsModal={closeManageGuestsModal}
+          onGuestsUpdated={handleGuestsUpdated}
+        />
       )}
     </div>
   );
