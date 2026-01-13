@@ -36,6 +36,10 @@ export function TripDetailsPage() {
     setIsUpdateTripModalOpen(true);
   }
 
+  function closeUpdateTripModal() {
+    setIsUpdateTripModalOpen(false);
+  }
+
   function openManageGuestsModal() {
     setIsManageGuestsModalOpen(true);
   }
