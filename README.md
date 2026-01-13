@@ -26,10 +26,12 @@ Uma aplicação completa para planejamento de viagens colaborativo, desenvolvida
 - ✅ **Criação de viagens** com destino e período
 - ✅ **Sistema de participantes** com convites por email
 - ✅ **Confirmação de viagens** e participantes
+- ✅ **Gerenciamento completo de convidados** (adicionar/remover)
 - ✅ **Gerenciamento de atividades** programadas
 - ✅ **Links importantes** organizados
 - ✅ **Interface responsiva** e moderna
 - ✅ **Validação robusta** de dados
+- ✅ **Sistema de notificações por email**
 - ✅ **Arquitetura escalável**
 
 ## 🏗️ Arquitetura
