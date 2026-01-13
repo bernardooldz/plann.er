@@ -1,8 +1,9 @@
 import { X, AtSign, Plus, Loader2 } from "lucide-react";
-import { FormEvent, useState, useEffect } from "react";
+import { type FormEvent, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "../../components/button";
 import { api } from "../../lib/axios";
+import { ConfirmRemoveParticipantModal } from "./confirm-remove-participant-modal";
 
 interface Participant {
   id: string;
@@ -25,6 +26,8 @@ export function ManageGuestsModal({
   const [emailsToInvite, setEmailsToInvite] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [hasChanges, setHasChanges] = useState(false);
+  const [participantToRemove, setParticipantToRemove] = useState<Participant | null>(null);
+  const [isRemoving, setIsRemoving] = useState(false);
 
   useEffect(() => {
     api
@@ -58,13 +61,41 @@ export function ManageGuestsModal({
     setHasChanges(remainingEmails.some(email => !currentEmails.includes(email)));
   }
 
+  function handleRemoveClick(participant: Participant) {
+    if (participant.is_confirmed) {
+      alert("Não é possível remover participantes que já confirmaram presença.");
+      return;
+    }
+    setParticipantToRemove(participant);
+  }
+
+  async function confirmRemoveParticipant() {
+    if (!participantToRemove) return;
+
+    setIsRemoving(true);
+    try {
+      await api.delete(`/trips/${tripId}/participants/${participantToRemove.id}`);
+      
+      const updatedParticipants = participants.filter(p => p.id !== participantToRemove.id);
+      setParticipants(updatedParticipants);
+      setEmailsToInvite(updatedParticipants.map(p => p.email));
+      
+      setParticipantToRemove(null);
+      onGuestsUpdated();
+    } catch (error) {
+      console.error("Erro ao remover participante:", error);
+      alert("Erro ao remover participante. Tente novamente.");
+    } finally {
+      setIsRemoving(false);
+    }
+  }
+
   async function saveGuestChanges() {
     setIsLoading(true);
     try {
       const currentEmails = participants.map(p => p.email);
       const emailsToAdd = emailsToInvite.filter(email => !currentEmails.includes(email));
 
-      // Add new participants one by one
       for (const email of emailsToAdd) {
         await api.post(`/trips/${tripId}/invites`, {
           email: email,
@@ -92,21 +123,32 @@ export function ManageGuestsModal({
             </button>
           </div>
           <p className="text-sm text-zinc-400">
-            Adicione novos convidados à viagem. Para remover participantes, entre em contato com o administrador.
+            Adicione novos convidados ou remova participantes não confirmados da viagem.
           </p>
         </div>
 
         <div className="flex flex-wrap gap-2">
           {emailsToInvite.map((email) => {
+            const participant = participants.find(p => p.email === email);
+            const isExisting = !!participant;
+            
             return (
               <div
                 key={email}
-                className="py-1.5 px-2.5 rounded-md bg-zinc-800 flex items-center gap-2"
+                className={`py-1.5 px-2.5 rounded-md flex items-center gap-2 ${
+                  isExisting ? "bg-zinc-700" : "bg-zinc-800"
+                }`}
               >
                 <span className="text-zinc-300">{email}</span>
                 <button
                   type="button"
-                  onClick={() => removeEmailFromInvites(email)}
+                  onClick={() => 
+                    isExisting && participant 
+                      ? handleRemoveClick(participant)
+                      : removeEmailFromInvites(email)
+                  }
+                  className={participant?.is_confirmed ? "opacity-50 cursor-not-allowed" : ""}
+                  disabled={participant?.is_confirmed}
                 >
                   <X className="size-4 text-zinc-400" />
                 </button>
@@ -154,6 +196,15 @@ export function ManageGuestsModal({
           )}
         </Button>
       </div>
+      
+      {participantToRemove && (
+        <ConfirmRemoveParticipantModal
+          participant={participantToRemove}
+          onConfirm={confirmRemoveParticipant}
+          onCancel={() => setParticipantToRemove(null)}
+          isLoading={isRemoving}
+        />
+      )}
     </div>
   );
 }

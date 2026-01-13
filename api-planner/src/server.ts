@@ -9,6 +9,7 @@ import { createLink } from "./routes/create-link";
 import { getLinks } from "./routes/get-links";
 import { getParticipants } from "./routes/get-participants";
 import { createInvite } from "./routes/create-invite";
+import { removeParticipant } from "./routes/remove-participant";
 import { updateTrip } from "./routes/update-trip";
 import { getTripDetails } from "./routes/get-trip-details";
 import { getParticipant } from "./routes/get-participant";
@@ -31,6 +32,7 @@ app.register(getTripDetails);
 app.register(confirmParticipants);
 app.register(getParticipants);
 app.register(createInvite);
+app.register(removeParticipant);
 app.register(getParticipant);
 
 app.register(createActivity);
