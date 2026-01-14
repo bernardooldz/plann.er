@@ -192,3 +192,21 @@ export default defineConfig({
 - **Form Validation** - Validação em tempo real
 - **Smooth Transitions** - Animações fluidas
 - **Accessibility** - Componentes acessíveis
+
+## 📚 Documentação Completa
+
+Para informações detalhadas sobre a arquitetura, componentes e desenvolvimento, consulte a documentação completa:
+
+- **[📖 Documentação Principal](./docs/README.md)** - Visão geral e arquitetura
+- **[🎨 Design System](./docs/design-system.md)** - Componentes e tokens de design
+- **[🗺️ Feature: Trips](./docs/features/trips.md)** - Documentação da feature de viagens
+- **[🧩 Componentes](./docs/components.md)** - Guia de componentes
+- **[🪝 Hooks](./docs/hooks.md)** - Custom hooks e padrões
+- **[🔌 Serviços](./docs/services.md)** - API e comunicação
+
+### Guias Rápidos
+
+- [Como adicionar uma nova feature](./docs/README.md#adicionando-uma-nova-feature)
+- [Como criar um novo componente](./docs/README.md#criando-um-novo-componente)
+- [Como usar o sistema de notificações](./docs/design-system.md#toast)
+- [Como fazer chamadas à API](./docs/services.md#endpoints)
