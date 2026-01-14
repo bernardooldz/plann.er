@@ -1,5 +1,5 @@
 import { Link2, Plus } from "lucide-react";
-import { Button } from "../../../design-system/components/ui/button";
+import { Button } from "../../../design-system";
 import { api } from "../services/trips.service";
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";

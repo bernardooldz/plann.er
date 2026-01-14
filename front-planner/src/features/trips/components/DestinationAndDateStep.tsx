@@ -1,5 +1,5 @@
 import { MapPin, Calendar, ArrowRight, Settings2, X } from "lucide-react";
-import { Button } from "../../../design-system/components/ui/button";
+import { Button } from "../../../design-system";
 import { useState } from "react";
 import { DayPicker, type DateRange } from "react-day-picker";
 import { format } from "date-fns";

@@ -1,7 +1,7 @@
 import { X, AtSign, Plus, Loader2 } from "lucide-react";
 import { type FormEvent, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Button } from "../../../design-system/components/ui/button";
+import { Button, Modal, Notification, useToast } from "../../../design-system";
 import { api } from "../services/trips.service";
 import { ConfirmRemoveParticipantModal } from "./ConfirmRemoveParticipantModal";
 
@@ -22,6 +22,7 @@ export function ManageGuestsModal({
   onGuestsUpdated,
 }: ManageGuestsModalProps) {
   const { tripId } = useParams();
+  const { addToast } = useToast();
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [emailsToInvite, setEmailsToInvite] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -63,7 +64,11 @@ export function ManageGuestsModal({
 
   function handleRemoveClick(participant: Participant) {
     if (participant.is_confirmed) {
-      alert("Não é possível remover participantes que já confirmaram presença.");
+      addToast({
+        type: 'error',
+        title: 'Não permitido',
+        message: 'Não é possível remover participantes que já confirmaram presença.'
+      });
       return;
     }
     setParticipantToRemove(participant);
@@ -80,11 +85,20 @@ export function ManageGuestsModal({
       setParticipants(updatedParticipants);
       setEmailsToInvite(updatedParticipants.map(p => p.email));
       
+      addToast({
+        type: 'success',
+        title: 'Participante removido!',
+        message: 'O participante foi removido da viagem.'
+      });
+      
       setParticipantToRemove(null);
       onGuestsUpdated();
-    } catch (error) {
-      console.error("Erro ao remover participante:", error);
-      alert("Erro ao remover participante. Tente novamente.");
+    } catch {
+      addToast({
+        type: 'error',
+        title: 'Erro ao remover',
+        message: 'Não foi possível remover o participante. Tente novamente.'
+      });
     } finally {
       setIsRemoving(false);
     }
@@ -102,31 +116,33 @@ export function ManageGuestsModal({
         });
       }
 
+      addToast({
+        type: 'success',
+        title: 'Convites enviados!',
+        message: 'Os novos convidados receberão um email de convite.'
+      });
+
       onGuestsUpdated();
       closeManageGuestsModal();
-    } catch (error) {
-      console.error("Erro ao salvar alterações:", error);
-      alert("Erro ao salvar alterações. Tente novamente.");
+    } catch {
+      addToast({
+        type: 'error',
+        title: 'Erro ao salvar',
+        message: 'Não foi possível salvar as alterações. Tente novamente.'
+      });
     } finally {
       setIsLoading(false);
     }
   }
 
   return (
-    <div className="fixed inset-0 bg-black/60 flex items-center justify-center">
-      <div className="w-160 rounded-xl py-5 px-6 shadow-shape bg-zinc-900 space-y-5">
-        <div className="space-y-2">
-          <div className="flex items-center justify-between">
-            <h2 className="font-semibold text-lg">Gerenciar convidados</h2>
-            <button onClick={closeManageGuestsModal}>
-              <X className="size-5 text-zinc-400" />
-            </button>
-          </div>
-          <p className="text-sm text-zinc-400">
-            Adicione novos convidados ou remova participantes não confirmados da viagem.
-          </p>
-        </div>
-
+    <>
+      <Modal
+        isOpen={true}
+        onClose={closeManageGuestsModal}
+        title="Gerenciar convidados"
+        description="Adicione novos convidados ou remova participantes não confirmados da viagem."
+      >
         <div className="flex flex-wrap gap-2">
           {emailsToInvite.map((email) => {
             const participant = participants.find(p => p.email === email);
@@ -180,9 +196,9 @@ export function ManageGuestsModal({
         </form>
 
         {hasChanges && (
-          <div className="text-sm text-lime-400 bg-lime-400/10 p-2 rounded-md">
-            ✓ Novos convidados adicionados. Clique em "Salvar alterações" para enviar os convites.
-          </div>
+          <Notification variant="success">
+            Há alterações pendentes. Clique em "Salvar alterações" para aplicar.
+          </Notification>
         )}
 
         <Button onClick={saveGuestChanges} size="full" disabled={isLoading || !hasChanges}>
@@ -195,7 +211,7 @@ export function ManageGuestsModal({
             "Salvar alterações"
           )}
         </Button>
-      </div>
+      </Modal>
       
       {participantToRemove && (
         <ConfirmRemoveParticipantModal
@@ -205,6 +221,6 @@ export function ManageGuestsModal({
           isLoading={isRemoving}
         />
       )}
-    </div>
+    </>
   );
 }

@@ -1,5 +1,5 @@
 import { CheckCircle2, CircleDashed, UserCog } from "lucide-react";
-import { Button } from "../../../design-system/components/ui/button";
+import { Button } from "../../../design-system";
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../services/trips.service";

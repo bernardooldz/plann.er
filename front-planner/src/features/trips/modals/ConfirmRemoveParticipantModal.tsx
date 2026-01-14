@@ -1,5 +1,5 @@
 import { X, AlertTriangle, Loader2 } from "lucide-react";
-import { Button } from "../../../design-system/components/ui/button";
+import { Button } from "../../../design-system";
 
 interface Participant {
   id: string;

@@ -1,5 +1,5 @@
 import { ArrowRight, UserRoundPlus } from "lucide-react";
-import { Button } from "../../../design-system/components/ui/button";
+import { Button } from "../../../design-system";
 
 interface InviteGuestsStepProps {
   openGuestsModal: () => void;

@@ -3,12 +3,19 @@ import { Toast } from "./toast";
 
 interface ToastData {
   id: string;
+  title?: string;
   message: string;
-  variant: "success" | "error" | "info" | "warning";
+  type: "success" | "error" | "info" | "warning";
+}
+
+interface AddToastParams {
+  type: ToastData["type"];
+  title?: string;
+  message: string;
 }
 
 interface ToastContextType {
-  showToast: (message: string, variant?: ToastData["variant"]) => void;
+  addToast: (params: AddToastParams) => void;
 }
 
 const ToastContext = createContext<ToastContextType | undefined>(undefined);
@@ -16,9 +23,9 @@ const ToastContext = createContext<ToastContextType | undefined>(undefined);
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastData[]>([]);
 
-  const showToast = (message: string, variant: ToastData["variant"] = "info") => {
+  const addToast = ({ type, title, message }: AddToastParams) => {
     const id = Math.random().toString(36).substr(2, 9);
-    setToasts(prev => [...prev, { id, message, variant }]);
+    setToasts(prev => [...prev, { id, title, message, type }]);
   };
 
   const removeToast = (id: string) => {
@@ -26,13 +33,13 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <ToastContext.Provider value={{ showToast }}>
+    <ToastContext.Provider value={{ addToast }}>
       {children}
       {toasts.map((toast, index) => (
         <Toast
           key={toast.id}
           message={toast.message}
-          variant={toast.variant}
+          variant={toast.type}
           onClose={() => removeToast(toast.id)}
           index={index}
         />

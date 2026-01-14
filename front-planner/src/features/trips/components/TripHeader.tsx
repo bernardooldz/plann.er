@@ -1,5 +1,5 @@
 import { MapPin, Calendar, Settings2 } from "lucide-react";
-import { Button } from "../../../design-system/components/ui/button";
+import { Button, Divider } from "../../../design-system";
 import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { api } from "../services/trips.service";
@@ -44,7 +44,7 @@ export function TripHeader({openUpdateTripModal} : DestinationAndDateHeaderProps
           <span className="text-sm text-zinc-100">{displayedDate}</span>
         </div>
 
-        <div className="w-px h-6 bg-zinc-800" />
+        <Divider orientation="vertical" />
 
         <Button variant="secondary" onClick={openUpdateTripModal}>
           Alterar local/data
