@@ -48,8 +48,8 @@ export function UpdateTripModal({ closeUpdateTripModal }: UpdateTripModalProps) 
     try {
       await api.put(`/trips/${tripId}`, {
         destination,
-        starts_at: eventStartAndEndDates.from,
-        ends_at: eventStartAndEndDates.to,
+        starts_at: eventStartAndEndDates.from.toISOString(),
+        ends_at: eventStartAndEndDates.to.toISOString(),
       });
 
       addToast({
