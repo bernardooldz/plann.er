@@ -15,6 +15,9 @@ import { removeParticipant } from "./routes/remove-participant";
 import { updateTrip } from "./routes/update-trip";
 import { getTripDetails } from "./routes/get-trip-details";
 import { getParticipant } from "./routes/get-participant";
+import { register } from "./routes/register";
+import { login } from "./routes/login";
+import { me } from "./routes/me";
 import { errorHandler } from "./error-handler";
 import { env } from "./env";
 
@@ -25,6 +28,13 @@ app.register(cors, {
 });
 
 app.setErrorHandler(errorHandler);
+
+// Auth routes
+app.register(register);
+app.register(login);
+app.register(me);
+
+// Trip routes
 
 app.register(createTrip);
 app.register(confirmTrip);
