@@ -18,6 +18,7 @@ import { getParticipant } from "./routes/get-participant";
 import { register } from "./routes/register";
 import { login } from "./routes/login";
 import { me } from "./routes/me";
+import { getUserTrips } from "./routes/get-user-trips";
 import { errorHandler } from "./error-handler";
 import { env } from "./env";
 
@@ -33,6 +34,7 @@ app.setErrorHandler(errorHandler);
 app.register(register);
 app.register(login);
 app.register(me);
+app.register(getUserTrips);
 
 // Trip routes
 

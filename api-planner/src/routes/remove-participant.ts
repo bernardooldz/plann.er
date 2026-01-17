@@ -5,9 +5,13 @@ import { dayjs } from "../lib/dayjs";
 import nodemailer from "nodemailer";
 import { getEmailClient } from "../lib/mail";
 import { ClientError } from "../errors/client-error";
+import { authMiddleware } from "../lib/auth-middleware";
+import { tripOwnerMiddleware } from "../lib/trip-owner-middleware";
 
 export async function removeParticipant(app: FastifyInstance) {
-  app.delete("/trips/:tripId/participants/:participantId", async (request) => {
+  app.delete("/trips/:tripId/participants/:participantId", {
+    preHandler: [authMiddleware, tripOwnerMiddleware]
+  }, async (request) => {
     const getParamsSchema = z.object({
       tripId: z.string().uuid(),
       participantId: z.string().uuid(),

@@ -6,9 +6,13 @@ import { dayjs } from "../lib/dayjs";
 import { ClientError } from "../errors/client-error";
 import { env } from "../env";
 import { getEmailClient } from "../lib/mail";
+import { authMiddleware } from "../lib/auth-middleware";
+import { tripOwnerMiddleware } from "../lib/trip-owner-middleware";
 
 export async function updateTrip(app: FastifyInstance) {
-  app.put("/trips/:tripId", async (request) => {
+  app.put("/trips/:tripId", {
+    preHandler: [authMiddleware, tripOwnerMiddleware]
+  }, async (request) => {
     const getTripParamsSchema = z.object({
       tripId: z.string().uuid(),
     });
