@@ -30,6 +30,14 @@ Interface moderna e responsiva para planejamento colaborativo de viagens, constr
 - **Links importantes** organizados
 - **Modais interativos** para criação de conteúdo
 
+### ✅ Página de Confirmação de Presença
+- **Confirmação via link do email** enviado aos participantes
+- **Interface responsiva** com feedback visual
+- **Estados de loading** com spinner animado
+- **Tratamento de erros** para casos edge
+- **Redirecionamento automático** após confirmação
+- **Verificação de status** para participantes já confirmados
+
 ## 🎨 Design System
 
 ### Componentes Base
@@ -57,6 +65,10 @@ const router = createBrowserRouter([
     path: "/trips/:tripId",
     element: <TripDetailsPage />,
   },
+  {
+    path: "/participants/:participantId/confirm",
+    element: <ConfirmParticipantPage />,
+  },
 ]);
 ```
 
@@ -70,6 +82,12 @@ const router = createBrowserRouter([
 - **Atividades**: Cronograma por data
 - **Participantes**: Lista com confirmações
 - **Links**: Recursos importantes
+
+### `/participants/:participantId/confirm` - Confirmação de Presença
+- **Página dedicada** para confirmação via link do email
+- **Estados visuais** de loading, sucesso e erro
+- **Redirecionamento automático** para a página da viagem
+- **Feedback em tempo real** do processo de confirmação
 
 ## 🛠️ Instalação e Execução
 
@@ -105,13 +123,15 @@ src/
 │   │       ├── destination-and-date-step.tsx
 │   │       ├── invite-guests-step.tsx
 │   │       └── date-picker.css
-│   └── trip-details/ # Página de detalhes
-│       ├── index.tsx
-│       ├── activities.tsx
-│       ├── create-activity-modal.tsx
-│       ├── destination-and-date-header.tsx
-│       ├── guests.tsx
-│       └── important-links.tsx
+│   ├── trip-details/ # Página de detalhes
+│   │   ├── index.tsx
+│   │   ├── activities.tsx
+│   │   ├── create-activity-modal.tsx
+│   │   ├── destination-and-date-header.tsx
+│   │   ├── guests.tsx
+│   │   └── important-links.tsx
+│   └── confirm-participant/ # Página de confirmação
+│       └── index.tsx
 ├── lib/              # Configurações
 │   └── axios.ts      # Cliente HTTP
 ├── app.tsx           # Configuração de rotas

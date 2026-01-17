@@ -193,25 +193,60 @@ DELETE /trips/:tripId/participants/:participantId
 await api.delete(`/trips/${tripId}/participants/${participantId}`);
 ```
 
+#### Buscar Participante
+
+```typescript
+GET /participants/:participantId
+
+// Response
+{
+  participant: {
+    id: string;
+    name: string | null;
+    email: string;
+    is_confirmed: boolean;
+    trip_id: string;
+  }
+}
+
+// Exemplo
+const response = await api.get(`/participants/${participantId}`);
+const participant = response.data.participant;
+```
+
 #### Confirmar Participante
 
 ```typescript
 PATCH /participants/:participantId/confirm
 
-// Request
-{
-  name: string;
-}
-
 // Response
 {
-  participantId: string;
+  message: string;
+  participant: {
+    id: string;
+    name: string | null;
+    email: string;
+    is_confirmed: boolean;
+    trip_id: string;
+  }
 }
 
 // Exemplo
-await api.patch(`/participants/${participantId}/confirm`, {
-  name: 'João Silva'
-});
+const response = await api.patch(`/participants/${participantId}/confirm`);
+const { message, participant } = response.data;
+```
+
+#### Confirmar Participante (Redirect)
+
+```typescript
+GET /participants/:participantId/confirm
+
+// Redireciona para: {WEB_BASE_URL}/participants/{participantId}/confirm
+// Usado pelos links de email
+
+// Exemplo de uso:
+// Link no email: http://localhost:3333/participants/123/confirm
+// Redireciona para: http://localhost:5173/participants/123/confirm
 ```
 
 ### Activities (Atividades)
