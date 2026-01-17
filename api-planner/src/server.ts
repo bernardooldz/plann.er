@@ -4,6 +4,7 @@ import { createTrip } from "./routes/create-trip";
 import { confirmTrip } from "./routes/confirm-trip";
 import { confirmParticipants } from "./routes/confirm-participant";
 import { confirmParticipantApi } from "./routes/confirm-participant-api";
+import { updateParticipant } from "./routes/update-participant";
 import { createActivity } from "./routes/create-activity";
 import { getActivities } from "./routes/get-activities";
 import { createLink } from "./routes/create-link";
@@ -32,6 +33,7 @@ app.register(getTripDetails);
 
 app.register(confirmParticipants);
 app.register(confirmParticipantApi);
+app.register(updateParticipant);
 app.register(getParticipants);
 app.register(createInvite);
 app.register(removeParticipant);

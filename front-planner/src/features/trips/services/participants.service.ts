@@ -17,5 +17,10 @@ export const participantsService = {
   async getParticipant(participantId: string) {
     const response = await api.get(`/participants/${participantId}`)
     return response.data.participant as Participant
+  },
+
+  async updateParticipant(participantId: string, name: string) {
+    const response = await api.put(`/participants/${participantId}`, { name })
+    return response.data.participant as Participant
   }
 }

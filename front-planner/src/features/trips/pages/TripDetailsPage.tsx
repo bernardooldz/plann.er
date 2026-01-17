@@ -8,9 +8,11 @@ import { CreateLinkModal } from "../modals/CreateLinkModal";
 import { ManageGuestsModal } from "../modals/ManageGuestsModal";
 import { GuestsList } from "../components/GuestsList";
 import { TripHeader } from "../components/TripHeader";
+import { Divider } from "../../../design-system";
 
 export function TripDetailsPage() {
-  const [isCreateActivityModalOpen, setIsCreateActivityModalOpen] = useState(false);
+  const [isCreateActivityModalOpen, setIsCreateActivityModalOpen] =
+    useState(false);
   const [isCreateLinkModalOpen, setIsCreateLinkModalOpen] = useState(false);
   const [isUpdateTripModalOpen, setIsUpdateTripModalOpen] = useState(false);
   const [isManageGuestsModalOpen, setIsManageGuestsModalOpen] = useState(false);
@@ -49,7 +51,7 @@ export function TripDetailsPage() {
   }
 
   function handleGuestsUpdated() {
-    setGuestsKey(prev => prev + 1);
+    setGuestsKey((prev) => prev + 1);
   }
 
   return (
@@ -73,11 +75,14 @@ export function TripDetailsPage() {
         </div>
 
         <div className="w-80 space-y-6">
-          <ImportantLinks openCreateLinkModal={openCreateLinkModal}/>
+          <ImportantLinks openCreateLinkModal={openCreateLinkModal} />
 
-          <div className="w-full h-px bg-zinc-800" />
+          <Divider />
 
-          <GuestsList key={guestsKey} openManageGuestsModal={openManageGuestsModal} />
+          <GuestsList
+            key={guestsKey}
+            openManageGuestsModal={openManageGuestsModal}
+          />
         </div>
       </main>
 
@@ -96,7 +101,7 @@ export function TripDetailsPage() {
       )}
 
       {isManageGuestsModalOpen && (
-        <ManageGuestsModal 
+        <ManageGuestsModal
           closeManageGuestsModal={closeManageGuestsModal}
           onGuestsUpdated={handleGuestsUpdated}
         />
