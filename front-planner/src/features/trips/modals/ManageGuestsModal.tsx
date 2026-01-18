@@ -1,7 +1,7 @@
-import { X, AtSign, Plus, Loader2 } from "lucide-react";
+import { X, AtSign, Plus, Loader2, Link2, Copy } from "lucide-react";
 import { type FormEvent, useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Modal, Notification, useToast } from "../../../design-system";
+import { Button, Modal, Notification, useToast, Divider } from "../../../design-system";
 import { api } from "../services/trips.service";
 import { ConfirmRemoveParticipantModal } from "./ConfirmRemoveParticipantModal";
 
@@ -29,18 +29,47 @@ export function ManageGuestsModal({
   const [hasChanges, setHasChanges] = useState(false);
   const [participantToRemove, setParticipantToRemove] = useState<Participant | null>(null);
   const [isRemoving, setIsRemoving] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
+
+  const inviteLink = `${window.location.origin}/participants/${tripId}/confirm`;
 
   useEffect(() => {
-    api
-      .get(`/trips/${tripId}/participants`)
-      .then((response: { data: { participants: Participant[] } }) => {
-        setParticipants(response.data.participants);
-        setEmailsToInvite(response.data.participants.map((p: Participant) => p.email));
+    if (!tripId) return;
+    
+    Promise.all([
+      api.get(`/trips/${tripId}/participants`),
+      api.get(`/trips/${tripId}`)
+    ])
+      .then(([participantsResponse, tripResponse]) => {
+        setParticipants(participantsResponse.data.participants);
+        setEmailsToInvite(participantsResponse.data.participants.map((p: Participant) => p.email));
+        setIsOwner(tripResponse.data.trip.is_owner);
       })
       .catch((error: Error) => {
-        console.error('Error loading participants:', error);
+        console.error('Error loading data:', error);
       });
   }, [tripId]);
+
+  const copyInviteLink = async () => {
+    try {
+      await navigator.clipboard.writeText(inviteLink);
+      setLinkCopied(true);
+      setTimeout(() => setLinkCopied(false), 2000);
+      addToast({
+        type: 'success',
+        title: 'Link copiado!',
+        message: 'O link de convite foi copiado para a área de transferência.'
+      });
+    } catch (err) {
+      console.error('Erro ao copiar link:', err);
+      addToast({
+        type: 'error',
+        title: 'Erro ao copiar',
+        message: 'Não foi possível copiar o link. Tente novamente.'
+      });
+    }
+  };
 
   async function addNewEmailToInvite(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -63,6 +92,15 @@ export function ManageGuestsModal({
   }
 
   function handleRemoveClick(participant: Participant) {
+    if (!isOwner) {
+      addToast({
+        type: 'error',
+        title: 'Não permitido',
+        message: 'Apenas o organizador da viagem pode remover participantes.'
+      });
+      return;
+    }
+    
     if (participant.is_confirmed) {
       addToast({
         type: 'error',
@@ -163,8 +201,8 @@ export function ManageGuestsModal({
                       ? handleRemoveClick(participant)
                       : removeEmailFromInvites(email)
                   }
-                  className={participant?.is_confirmed ? "opacity-50 cursor-not-allowed" : ""}
-                  disabled={participant?.is_confirmed}
+                  className={participant?.is_confirmed || (isExisting && !isOwner) ? "opacity-50 cursor-not-allowed" : ""}
+                  disabled={participant?.is_confirmed || (isExisting && !isOwner)}
                 >
                   <X className="size-4 text-zinc-400" />
                 </button>
@@ -173,7 +211,7 @@ export function ManageGuestsModal({
           })}
         </div>
 
-        <div className="w-full h-px bg-zinc-800"></div>
+        <Divider />
 
         <form
           onSubmit={addNewEmailToInvite}
@@ -194,6 +232,28 @@ export function ManageGuestsModal({
             <Plus className="size-5 text-lime-950" />
           </Button>
         </form>
+
+        <Divider />
+
+        <div className="bg-zinc-800/50 p-3 rounded-lg">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Link2 className="size-4 text-zinc-400" />
+              <span className="text-md text-zinc-300">Compartilhar link da viagem</span>
+            </div>
+            <Button 
+              variant="secondary" 
+              onClick={copyInviteLink}
+              size="default"
+            >
+              <Copy className="size-4" />
+              {linkCopied ? 'Copiado!' : 'Copiar'}
+            </Button>
+          </div>
+          <p className="text-sm text-zinc-500">
+            Qualquer pessoa com este link pode se juntar à viagem
+          </p>
+        </div>
 
         {hasChanges && (
           <Notification variant="success">

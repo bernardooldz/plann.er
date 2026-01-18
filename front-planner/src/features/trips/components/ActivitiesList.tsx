@@ -17,12 +17,41 @@ interface ActivityGroup {
 export function ActivitiesList() {
   const { tripId } = useParams();
   const [activities, setActivities] = useState<ActivityGroup[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    if (!tripId) return;
+    
     api
       .get(`/trips/${tripId}/activities`)
-      .then((response: { data: { activities: ActivityGroup[] } }) => setActivities(response.data.activities));
+      .then((response) => {
+        setActivities(response.data.activities || []);
+      })
+      .catch((error) => {
+        console.error('Erro ao carregar atividades:', error);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [tripId]);
+
+  if (loading) {
+    return (
+      <div className="space-y-8">
+        <div className="text-zinc-400">Carregando atividades...</div>
+      </div>
+    );
+  }
+
+  if (activities.length === 0) {
+    return (
+      <div className="space-y-8">
+        <p className="text-sm text-zinc-500">
+          Nenhuma atividade cadastrada ainda.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">
@@ -31,10 +60,10 @@ export function ActivitiesList() {
           <div key={category.date} className="space-y-2.5">
             <div className="flex gap-2 items-baseline">
               <span className="text-xl text-zinc-300 font-semibold">
-                Dia {format(category.date, "d")}
+                Dia {format(new Date(category.date), "d")}
               </span>
               <span className="text-xs text-zinc-500">
-                {format(category.date, "EEEE", { locale: ptBR })}
+                {format(new Date(category.date), "EEEE", { locale: ptBR })}
               </span>
             </div>
             {category.activities.length > 0 ? (
@@ -46,7 +75,7 @@ export function ActivitiesList() {
                         <CircleCheck className="size-5 text-lime-300" />
                         <span className="text-zinc-100">{activity.title}</span>
                         <span className="text-zinc-400 text-sm ml-auto">
-                          {format(activity.occurs_at, "HH:mm")}h
+                          {format(new Date(activity.occurs_at), "HH:mm")}h
                         </span>
                       </div>
                     </div>

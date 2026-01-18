@@ -15,6 +15,7 @@ import { removeParticipant } from "./routes/remove-participant";
 import { updateTrip } from "./routes/update-trip";
 import { getTripDetails } from "./routes/get-trip-details";
 import { getParticipant } from "./routes/get-participant";
+import { leaveTrip } from "./routes/leave-trip";
 import { register } from "./routes/register";
 import { login } from "./routes/login";
 import { me } from "./routes/me";
@@ -44,6 +45,7 @@ app.register(createTrip);
 app.register(confirmTrip);
 app.register(updateTrip);
 app.register(getTripDetails);
+app.register(leaveTrip);
 
 app.register(confirmParticipants);
 app.register(confirmParticipantApi);
