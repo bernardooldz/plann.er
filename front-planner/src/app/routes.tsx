@@ -3,7 +3,7 @@ import { CreateTripPage } from '../features/trips/pages/CreateTripPage'
 import { TripDetailsPage } from '../features/trips/pages/TripDetailsPage'
 import { ConfirmParticipantPage } from '../features/trips/pages/ConfirmParticipantPage'
 import { LoginPage, RegisterPage, DashboardPage } from '../features/auth'
-import { useAuth } from '../shared/contexts/auth-context'
+import { useAuth } from '../features/auth'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()

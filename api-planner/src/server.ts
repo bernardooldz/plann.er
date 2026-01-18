@@ -19,6 +19,7 @@ import { register } from "./routes/register";
 import { login } from "./routes/login";
 import { me } from "./routes/me";
 import { getUserTrips } from "./routes/get-user-trips";
+import { updateProfile } from "./routes/update-profile";
 import { errorHandler } from "./error-handler";
 import { env } from "./env";
 
@@ -35,6 +36,7 @@ app.register(register);
 app.register(login);
 app.register(me);
 app.register(getUserTrips);
+app.register(updateProfile);
 
 // Trip routes
 

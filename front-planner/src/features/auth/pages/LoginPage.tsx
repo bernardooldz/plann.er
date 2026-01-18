@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Eye, EyeOff, LockKeyhole, Mail } from "lucide-react";
 import { Button, Input } from "../../../design-system";
-import { useAuth } from "../../../shared/contexts/auth-context";
+import { useAuth } from '../hooks/useAuth';
 
 export function LoginPage() {
   const [email, setEmail] = useState("");

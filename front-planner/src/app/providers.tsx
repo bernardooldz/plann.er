@@ -1,6 +1,6 @@
 import { type ReactNode } from 'react'
+import { AuthProvider, useAuth } from '../features/auth'
 import { ToastProvider } from '../design-system/components/ui/toast-provider'
-import { AuthProvider } from '../shared/contexts/auth-context'
 
 interface ProvidersProps {
   children: ReactNode
