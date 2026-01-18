@@ -7,13 +7,18 @@ import { confirmParticipantApi } from "./routes/confirm-participant-api";
 import { updateParticipant } from "./routes/update-participant";
 import { createActivity } from "./routes/create-activity";
 import { getActivities } from "./routes/get-activities";
+import { updateActivity } from "./routes/update-activity";
+import { deleteActivity } from "./routes/delete-activity";
 import { createLink } from "./routes/create-link";
 import { getLinks } from "./routes/get-links";
+import { updateLink } from "./routes/update-link";
+import { deleteLink } from "./routes/delete-link";
 import { getParticipants } from "./routes/get-participants";
 import { createInvite } from "./routes/create-invite";
 import { removeParticipant } from "./routes/remove-participant";
 import { updateTrip } from "./routes/update-trip";
 import { getTripDetails } from "./routes/get-trip-details";
+import { deleteTrip } from "./routes/delete-trip";
 import { getParticipant } from "./routes/get-participant";
 import { leaveTrip } from "./routes/leave-trip";
 import { register } from "./routes/register";
@@ -44,6 +49,7 @@ app.register(updateProfile);
 app.register(createTrip);
 app.register(confirmTrip);
 app.register(updateTrip);
+app.register(deleteTrip);
 app.register(getTripDetails);
 app.register(leaveTrip);
 
@@ -57,9 +63,13 @@ app.register(getParticipant);
 
 app.register(createActivity);
 app.register(getActivities);
+app.register(updateActivity);
+app.register(deleteActivity);
 
 app.register(createLink);
 app.register(getLinks);
+app.register(updateLink);
+app.register(deleteLink);
 
 app.get("/health", async () => {
   return { status: "OK" };

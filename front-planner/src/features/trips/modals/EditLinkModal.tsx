@@ -5,16 +5,23 @@ import { api } from "../services/trips.service";
 import { useParams } from "react-router-dom";
 import { useState } from "react";
 
-interface CreateLinkModalProps {
-  closeCreateLinkModal: () => void;
+interface Link {
+  id: string;
+  title: string;
+  url: string;
 }
 
-export function CreateLinkModal({ closeCreateLinkModal }: CreateLinkModalProps) {
+interface EditLinkModalProps {
+  link: Link;
+  closeEditLinkModal: () => void;
+}
+
+export function EditLinkModal({ link, closeEditLinkModal }: EditLinkModalProps) {
   const { tripId } = useParams();
   const { addToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  async function createLink(event: FormEvent<HTMLFormElement>) {
+  async function updateLink(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
 
@@ -23,23 +30,23 @@ export function CreateLinkModal({ closeCreateLinkModal }: CreateLinkModalProps) 
     const url = data.get("url")?.toString();
 
     try {
-      await api.post(`/trips/${tripId}/links`, {
+      await api.put(`/trips/${tripId}/links/${link.id}`, {
         title,
         url,
       });
 
       addToast({
         type: 'success',
-        title: 'Link cadastrado!',
-        message: 'O link foi adicionado com sucesso.'
+        title: 'Link atualizado!',
+        message: 'O link foi atualizado com sucesso.'
       });
 
-      closeCreateLinkModal();
+      closeEditLinkModal();
     } catch {
       addToast({
         type: 'error',
-        title: 'Erro ao cadastrar link',
-        message: 'Não foi possível adicionar o link. Tente novamente.'
+        title: 'Erro ao atualizar link',
+        message: 'Não foi possível atualizar o link. Tente novamente.'
       });
     } finally {
       setIsLoading(false);
@@ -49,15 +56,16 @@ export function CreateLinkModal({ closeCreateLinkModal }: CreateLinkModalProps) 
   return (
     <Modal
       isOpen={true}
-      onClose={closeCreateLinkModal}
-      title="Cadastrar link"
-      description="Todos convidados podem visualizar os links importantes."
+      onClose={closeEditLinkModal}
+      title="Editar link"
+      description="Atualize as informações do link."
     >
-      <form onSubmit={createLink} className="space-y-3">
+      <form onSubmit={updateLink} className="space-y-3">
         <Input
           icon={<Tag className="size-5" />}
           name="title"
           placeholder="Título do link"
+          defaultValue={link.title}
         />
 
         <Input
@@ -65,10 +73,11 @@ export function CreateLinkModal({ closeCreateLinkModal }: CreateLinkModalProps) 
           type="url"
           name="url"
           placeholder="URL"
+          defaultValue={link.url}
         />
 
         <Button type="submit" variant="primary" size="full" disabled={isLoading}>
-          {isLoading ? 'Salvando...' : 'Salvar link'}
+          {isLoading ? 'Salvando...' : 'Salvar alterações'}
         </Button>
       </form>
     </Modal>

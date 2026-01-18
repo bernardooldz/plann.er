@@ -14,8 +14,10 @@ model User {
   password   String
   created_at DateTime @default(now())
 
-  trips        Trip[]        @relation("TripOwner")
-  participants Participant[]
+  trips              Trip[]        @relation("TripOwner")
+  participants       Participant[]
+  created_activities Activity[]    @relation("ActivityCreator")
+  created_links      Link[]        @relation("LinkCreator")
 
   @@map("users")
 }
@@ -54,23 +56,27 @@ model Participant {
 }
 
 model Activity {
-  id        String   @id @default(uuid())
-  title     String
-  occurs_at DateTime
+  id         String   @id @default(uuid())
+  title      String
+  occurs_at  DateTime
+  created_by String?
 
   trip    Trip   @relation(fields: [trip_id], references: [id])
   trip_id String
+  creator User?  @relation("ActivityCreator", fields: [created_by], references: [id])
 
   @@map("activities")
 }
 
 model Link {
-  id    String @id @default(uuid())
-  title String
-  url   String
+  id         String @id @default(uuid())
+  title      String
+  url        String
+  created_by String?
 
   trip    Trip   @relation(fields: [trip_id], references: [id])
   trip_id String
+  creator User?  @relation("LinkCreator", fields: [created_by], references: [id])
 
   @@map("links")
 }

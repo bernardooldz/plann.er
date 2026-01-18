@@ -14,6 +14,7 @@ export async function getLinks(app: FastifyInstance) {
     });
 
     const { tripId } = getTripParamsSchema.parse(request.params);
+    const userId = request.user.id;
 
     const trip = await prisma.trip.findUnique({
       where: { id: tripId },
@@ -26,6 +27,11 @@ export async function getLinks(app: FastifyInstance) {
       throw new ClientError("Trip not found.");
     }
 
-    return { links: trip.links };
+    const linksWithPermissions = trip.links.map(link => ({
+      ...link,
+      can_edit: true // Temporariamente todos podem editar até migração
+    }));
+
+    return { links: linksWithPermissions };
   });
 }

@@ -4,19 +4,31 @@ import type { FormEvent } from "react";
 import { useParams } from "react-router-dom";
 import { api } from "../services/trips.service";
 import { useState } from "react";
+import { format } from "date-fns";
 
-interface CreateActivityModalProps {
-  closeCreateActivityModal: () => void;
+interface Activity {
+  id: string;
+  title: string;
+  occurs_at: string;
 }
 
-export function CreateActivityModal({
-  closeCreateActivityModal,
-}: CreateActivityModalProps) {
+interface EditActivityModalProps {
+  activity: Activity;
+  closeEditActivityModal: () => void;
+}
+
+export function EditActivityModal({
+  activity,
+  closeEditActivityModal,
+}: EditActivityModalProps) {
   const { tripId } = useParams();
   const { addToast } = useToast();
   const [isLoading, setIsLoading] = useState(false);
 
-  async function createActivity(event: FormEvent<HTMLFormElement>) {
+  // Format date for datetime-local input
+  const formattedDate = format(new Date(activity.occurs_at), "yyyy-MM-dd'T'HH:mm");
+
+  async function updateActivity(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setIsLoading(true);
 
@@ -25,23 +37,23 @@ export function CreateActivityModal({
     const occurs_at = data.get("occurs_at")?.toString();
 
     try {
-      await api.post(`/trips/${tripId}/activities`, {
+      await api.put(`/trips/${tripId}/activities/${activity.id}`, {
         title,
         occurs_at,
       });
 
       addToast({
         type: 'success',
-        title: 'Atividade criada!',
-        message: 'A atividade foi cadastrada com sucesso.'
+        title: 'Atividade atualizada!',
+        message: 'A atividade foi atualizada com sucesso.'
       });
 
-      closeCreateActivityModal();
+      closeEditActivityModal();
     } catch {
       addToast({
         type: 'error',
-        title: 'Erro ao criar atividade',
-        message: 'Não foi possível cadastrar a atividade. Tente novamente.'
+        title: 'Erro ao atualizar atividade',
+        message: 'Não foi possível atualizar a atividade. Tente novamente.'
       });
     } finally {
       setIsLoading(false);
@@ -51,15 +63,16 @@ export function CreateActivityModal({
   return (
     <Modal
       isOpen={true}
-      onClose={closeCreateActivityModal}
-      title="Cadastrar atividade"
-      description="Todos convidados podem visualizar as atividades."
+      onClose={closeEditActivityModal}
+      title="Editar atividade"
+      description="Atualize as informações da atividade."
     >
-      <form onSubmit={createActivity} className="space-y-3">
+      <form onSubmit={updateActivity} className="space-y-3">
         <Input
           icon={<Tag className="size-5" />}
           name="title"
           placeholder="Qual a atividade?"
+          defaultValue={activity.title}
         />
 
         <Input
@@ -67,10 +80,11 @@ export function CreateActivityModal({
           type="datetime-local"
           name="occurs_at"
           placeholder="Data e horário da atividade"
+          defaultValue={formattedDate}
         />
 
         <Button type="submit" variant="primary" size="full" disabled={isLoading}>
-          {isLoading ? 'Salvando...' : 'Salvar atividade'}
+          {isLoading ? 'Salvando...' : 'Salvar alterações'}
         </Button>
       </form>
     </Modal>

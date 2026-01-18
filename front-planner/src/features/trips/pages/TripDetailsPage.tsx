@@ -23,8 +23,7 @@ export function TripDetailsPage() {
   const [isDeleteTripModalOpen, setIsDeleteTripModalOpen] = useState(false);
   const [isLeaveTripModalOpen, setIsLeaveTripModalOpen] = useState(false);
   const [guestsKey, setGuestsKey] = useState(0);
-  const [activitiesKey, setActivitiesKey] = useState(0);
-  const [linksKey, setLinksKey] = useState(0);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   const [tripExists, setTripExists] = useState<boolean | null>(null);
   const [tripDestination, setTripDestination] = useState("");
 
@@ -49,7 +48,7 @@ export function TripDetailsPage() {
 
   function closeCreateActivityModal() {
     setIsCreateActivityModalOpen(false);
-    setActivitiesKey(prev => prev + 1); // Refresh activities list
+    setRefreshTrigger(prev => prev + 1);
   }
 
   function openCreateLinkModal() {
@@ -58,7 +57,7 @@ export function TripDetailsPage() {
 
   function closeCreateLinkModal() {
     setIsCreateLinkModalOpen(false);
-    setLinksKey(prev => prev + 1); // Refresh links list
+    setRefreshTrigger(prev => prev + 1);
   }
 
   function openUpdateTripModal() {
@@ -137,11 +136,14 @@ export function TripDetailsPage() {
             </button>
           </div>
 
-          <ActivitiesList key={activitiesKey} />
+          <ActivitiesList key={refreshTrigger} />
         </div>
 
         <div className="w-80 space-y-6">
-          <ImportantLinks key={linksKey} openCreateLinkModal={openCreateLinkModal} />
+          <ImportantLinks 
+            openCreateLinkModal={openCreateLinkModal} 
+            refreshTrigger={refreshTrigger}
+          />
 
           <Divider />
 

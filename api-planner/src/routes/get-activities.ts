@@ -15,6 +15,7 @@ export async function getActivities(app: FastifyInstance) {
     });
 
     const { tripId } = getTripParamsSchema.parse(request.params);
+    const userId = request.user.id;
 
     const trip = await prisma.trip.findUnique({
       where: { id: tripId },
@@ -43,9 +44,12 @@ export async function getActivities(app: FastifyInstance) {
 
       return {
         date: date.toDate(),
-        activities: trip.activities.filter((activities) => {
-          return dayjs(activities.occurs_at).isSame(date, "day");
-        }),
+        activities: trip.activities.filter((activity) => {
+          return dayjs(activity.occurs_at).isSame(date, "day");
+        }).map(activity => ({
+          ...activity,
+          can_edit: true // Temporariamente todos podem editar até migração
+        })),
       };
     });
 
