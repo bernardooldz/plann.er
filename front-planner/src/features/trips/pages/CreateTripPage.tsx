@@ -1,32 +1,43 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import { InviteGuestsModal } from "../modals/InviteGuestsModal";
-import { ConfrimTripModal } from "../modals/ConfirmTripModal";
 import { DestinationAndDateStep } from "../components/DestinationAndDateStep";
 import { InviteGuestsStep } from "../components/InviteGuestsStep";
 import type { DateRange } from "react-day-picker";
-import { api } from "../services/trips.service";
+import { api } from "../../../shared/utils/api";
+import { useAuth } from "../../auth";
 
 export function CreateTripPage() {
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   const [isGuestsInputOpen, setIsGuestsInputOpen] = useState(false);
   const [isGuestsModalOpen, setIsGuestsModalOpen] = useState(false);
-  const [isConfrimTripModalOpen, setIsConfrimTripModalOpen] = useState(false);
-
   const [destination, setDestination] = useState("");
-  const [ownerName, setOwnerName] = useState("");
-  const [ownerEmail, setOwnerEmail] = useState("");
-  const [eventStartAndEndDates, setEventStartAndEndDates] = useState<
-    DateRange | undefined
-  >();
+  const [eventStartAndEndDates, setEventStartAndEndDates] = useState<DateRange | undefined>();
+  const [emailsToInvite, setEmailsToInvite] = useState<string[]>([]);
+  const [errors, setErrors] = useState({ destination: "", dates: "", general: "" });
+  const [loading, setLoading] = useState(false);
 
-  const [emailsToInvite, setEmailsToInvite] = useState([
-    "diego@rockeseat.com.br",
-    "john.doe@acme.com",
-  ]);
+  function validateForm() {
+    const newErrors = { destination: "", dates: "", general: "" };
+    
+    if (!destination.trim()) {
+      newErrors.destination = "Destino é obrigatório";
+    } else if (destination.trim().length < 4) {
+      newErrors.destination = "Destino deve ter pelo menos 4 caracteres";
+    }
+    
+    if (!eventStartAndEndDates?.from || !eventStartAndEndDates?.to) {
+      newErrors.dates = "Datas de início e fim são obrigatórias";
+    }
+    
+    setErrors(newErrors);
+    return !newErrors.destination && !newErrors.dates;
+  }
 
   function openGuestsInput() {
+    if (!validateForm()) return;
     setIsGuestsInputOpen(true);
   }
 
@@ -42,78 +53,41 @@ export function CreateTripPage() {
     setIsGuestsModalOpen(false);
   }
 
-  function openConfirmTripModal() {
-    setIsConfrimTripModalOpen(true);
-  }
-
-  function closeConfirmModal() {
-    setIsConfrimTripModalOpen(false);
-  }
-
   function addNewEmailToInvite(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     const data = new FormData(event.currentTarget);
     const email = data.get("email")?.toString();
 
-    if (!email) {
-      return;
-    }
-
-    if (emailsToInvite.includes(email)) {
-      return;
-    }
+    if (!email || emailsToInvite.includes(email)) return;
 
     setEmailsToInvite([...emailsToInvite, email]);
-
     event.currentTarget.reset();
   }
 
   function removeEmailFromInvites(emailToRemove: string) {
-    const newEmailList = emailsToInvite.filter(
-      (email) => email !== emailToRemove
-    );
-
-    setEmailsToInvite(newEmailList);
+    setEmailsToInvite(emailsToInvite.filter(email => email !== emailToRemove));
   }
 
-  async function createTrip(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  async function createTrip() {
+    if (!validateForm()) return;
+    
+    setLoading(true);
+    setErrors({ destination: "", dates: "", general: "" });
 
-    console.log(destination);
-    console.log(eventStartAndEndDates);
-    console.log(emailsToInvite);
-    console.log(ownerName);
-    console.log(ownerEmail);
+    try {
+      const response = await api.post("/trips", {
+        destination: destination.trim(),
+        starts_at: eventStartAndEndDates!.from,
+        ends_at: eventStartAndEndDates!.to,
+        emails_to_invite: emailsToInvite,
+      });
 
-    if (!destination) {
-      return;
+      navigate(`/trips/${response.data.tripId}`);
+    } catch (err: any) {
+      setErrors({ destination: "", dates: "", general: err.response?.data?.message || "Erro ao criar viagem" });
+    } finally {
+      setLoading(false);
     }
-
-    if (!eventStartAndEndDates?.from || !eventStartAndEndDates?.from) {
-      return;
-    }
-
-    if (emailsToInvite.length === 0) {
-      return;
-    }
-
-    if (!ownerName || !ownerEmail) {
-      return;
-    }
-
-    const response = await api.post("/trips", {
-      destination: destination,
-      starts_at: eventStartAndEndDates.from,
-      ends_at: eventStartAndEndDates.to,
-      emails_to_invite: emailsToInvite,
-      owner_name: ownerName,
-      owner_email: ownerEmail,
-    });
-
-    const { tripId } = response.data;
-
-    navigate(`/trips/${tripId}`);
   }
 
   return (
@@ -121,8 +95,8 @@ export function CreateTripPage() {
       <div className="max-w-3xl w-full px-6 text-center space-y-10">
         <div className="flex flex-col items-center gap-3">
           <img src="/src/assets/logo.svg" alt="plann.er" />
-          <p className="text-zinc-300 text-md">
-            Convide seus amigos e planeje sua próxima viagem!
+          <p className="text-zinc-300 text-lg">
+            Crie sua nova viagem e convide seus amigos!
           </p>
         </div>
 
@@ -134,29 +108,29 @@ export function CreateTripPage() {
             setDestination={setDestination}
             eventStartAndEndDates={eventStartAndEndDates}
             setEventStartAndEndDates={setEventStartAndEndDates}
+            errors={errors}
           />
 
           {isGuestsInputOpen && (
             <InviteGuestsStep
               emailsToInvite={emailsToInvite}
-              openConfirmTripModal={openConfirmTripModal}
               openGuestsModal={openGuestsModal}
+              createTrip={createTrip}
+              loading={loading}
             />
           )}
         </div>
 
-        <p className="text-sm text-zinc-500">
-          Ao planejar sua viagem pela plann.er você automaticamente concorda{" "}
-          <br /> com nossos{" "}
-          <a href="#" className="text-zinc-300 underline">
-            termos de uso
-          </a>{" "}
-          e{" "}
-          <a href="" className="text-zinc-300 underline">
-            políticas de privacidade
-          </a>
-          .
-        </p>
+        {errors.general && (
+          <p className="text-red-400 text-sm">{errors.general}</p>
+        )}
+
+        <div className="flex items-center justify-center gap-2 text-sm text-zinc-500">
+          <span>Organizador:</span>
+          <span className="text-zinc-300">{user?.name}</span>
+          <span>•</span>
+          <span className="text-zinc-300">{user?.email}</span>
+        </div>
       </div>
 
       {isGuestsModalOpen && (
@@ -165,15 +139,6 @@ export function CreateTripPage() {
           addNewEmailToInvite={addNewEmailToInvite}
           removeEmailFromInvites={removeEmailFromInvites}
           closeGuestsModal={closeGuestsModal}
-        />
-      )}
-
-      {isConfrimTripModalOpen && (
-        <ConfrimTripModal
-          closeConfirmModal={closeConfirmModal}
-          createTrip={createTrip}
-          setOwnerName={setOwnerName}
-          setOwnerEmail={setOwnerEmail}
         />
       )}
     </div>

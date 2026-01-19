@@ -3,14 +3,16 @@ import { Button } from "../../../design-system";
 
 interface InviteGuestsStepProps {
   openGuestsModal: () => void;
-  openConfirmTripModal: () => void;
+  createTrip: () => void;
   emailsToInvite: string[];
+  loading: boolean;
 }
 
 export function InviteGuestsStep({
   openGuestsModal,
-  openConfirmTripModal,
+  createTrip,
   emailsToInvite,
+  loading,
 }: InviteGuestsStepProps) {
   return (
     <div className="h-16 bg-zinc-900 px-4 rounded-xl flex items-center shadow-shape gap-3">
@@ -31,8 +33,8 @@ export function InviteGuestsStep({
         )}
       </button>
 
-      <Button onClick={openConfirmTripModal}>
-        Confrirmar viagem
+      <Button onClick={createTrip} disabled={loading}>
+        {loading ? 'Criando...' : 'Confirmar viagem'}
         <ArrowRight className="size-5 text-lime-950" />
       </Button>
     </div>

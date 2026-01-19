@@ -3,14 +3,19 @@ import { z } from "zod";
 import { prisma } from "../lib/prisma";
 import { dayjs } from "../lib/dayjs";
 import { ClientError } from "../errors/client-error";
+import { authMiddleware } from "../lib/auth-middleware";
+import { tripParticipantMiddleware } from "../lib/trip-participant-middleware";
 
 export async function getActivities(app: FastifyInstance) {
-  app.get("/trips/:tripId/activities", async (request) => {
+  app.get("/trips/:tripId/activities", {
+    preHandler: [authMiddleware, tripParticipantMiddleware]
+  }, async (request) => {
     const getTripParamsSchema = z.object({
       tripId: z.string().uuid(),
     });
 
     const { tripId } = getTripParamsSchema.parse(request.params);
+    const userId = request.user.id;
 
     const trip = await prisma.trip.findUnique({
       where: { id: tripId },
@@ -39,9 +44,12 @@ export async function getActivities(app: FastifyInstance) {
 
       return {
         date: date.toDate(),
-        activities: trip.activities.filter((activities) => {
-          return dayjs(activities.occurs_at).isSame(date, "day");
-        }),
+        activities: trip.activities.filter((activity) => {
+          return dayjs(activity.occurs_at).isSame(date, "day");
+        }).map(activity => ({
+          ...activity,
+          can_edit: true // Temporariamente todos podem editar até migração
+        })),
       };
     });
 

@@ -36,7 +36,7 @@ export function CreateActivityModal({
         message: 'A atividade foi cadastrada com sucesso.'
       });
 
-      window.document.location.reload();
+      closeCreateActivityModal();
     } catch {
       addToast({
         type: 'error',
