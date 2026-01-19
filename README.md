@@ -10,31 +10,35 @@ Uma aplicação completa para planejamento de viagens colaborativo, desenvolvida
 - **Prisma ORM** - Modelagem e queries do banco de dados
 - **SQLite** - Banco de dados
 - **Zod** - Validação de schemas
-- **Nodemailer** - Envio de emails
+- **JWT** - Autenticação e autorização
+- **Bcrypt** - Hash de senhas
 
 ### Frontend
 - **React 19** com **TypeScript**
 - **Vite** - Build tool moderna
 - **Tailwind CSS** - Framework CSS utilitário
 - **React Router DOM** - Roteamento
-- **Axios** - Cliente HTTP
+- **Axios** - Cliente HTTP com interceptors
 - **Lucide React** - Ícones
 - **React Day Picker** - Seletor de datas
+- **Context API** - Gerenciamento de estado de autenticação
 
 ## 📋 Funcionalidades
 
-- ✅ **Criação de viagens** com destino e período
-- ✅ **Sistema de participantes** com convites por email
-- ✅ **Confirmação de viagens** e participantes
-- ✅ **Confirmação de presença via email** com link direto
+- ✅ **Sistema de autenticação JWT** completo com registro e login
+- ✅ **Dashboard de usuário** com listagem de viagens pessoais
+- ✅ **Criação de viagens** via modal com destino e período
+- ✅ **Sistema de convites por link** (sem emails)
+- ✅ **Controle de permissões** baseado em proprietário/participante
+- ✅ **Auto-confirmação de participantes** via interface
 - ✅ **Gerenciamento completo de convidados** (adicionar/remover)
-- ✅ **Gerenciamento de atividades** programadas
-- ✅ **Links importantes** organizados
+- ✅ **CRUD de atividades** com controle de permissões
+- ✅ **CRUD de links importantes** com controle de permissões
 - ✅ **Interface responsiva** e moderna
-- ✅ **Validação robusta** de dados
-- ✅ **Sistema de notificações por email**
-- ✅ **Redirecionamento inteligente** após confirmações
-- ✅ **Arquitetura escalável**
+- ✅ **Validação robusta** de dados no frontend e backend
+- ✅ **Middleware de proteção** de rotas
+- ✅ **Interceptors automáticos** para renovação de tokens
+- ✅ **Arquitetura escalável** com separação de responsabilidades
 
 ## 🏗️ Arquitetura
 
@@ -44,14 +48,29 @@ Plann.er/
 │   ├── prisma/           # Schema e migrações do banco
 │   ├── src/
 │   │   ├── routes/       # Endpoints da API
+│   │   │   ├── auth/     # Rotas de autenticação
+│   │   │   ├── trips/    # CRUD de viagens
+│   │   │   ├── participants/ # Gerenciamento de participantes
+│   │   │   ├── activities/   # CRUD de atividades
+│   │   │   └── links/    # CRUD de links
 │   │   ├── lib/          # Utilitários e configurações
+│   │   ├── middleware/   # Middleware de autenticação
 │   │   └── errors/       # Tratamento de erros
 │   └── ...
 └── front-planner/        # Frontend React
     ├── src/
-    │   ├── components/   # Componentes reutilizáveis
-    │   ├── pages/        # Páginas da aplicação
-    │   └── lib/          # Configurações e utilitários
+    │   ├── features/     # Funcionalidades organizadas
+    │   │   ├── auth/     # Sistema de autenticação
+    │   │   │   ├── hooks/    # useAuth context
+    │   │   │   ├── pages/    # Login, Register, Dashboard
+    │   │   │   └── services/ # API calls de auth
+    │   │   └── trips/    # Gerenciamento de viagens
+    │   │       ├── components/ # Componentes reutilizáveis
+    │   │       ├── pages/     # Páginas de viagem
+    │   │       ├── modals/    # Modais de CRUD
+    │   │       └── services/  # API calls de viagens
+    │   ├── design-system/ # Componentes base
+    │   └── shared/       # Utilitários compartilhados
     └── ...
 ```
 
@@ -72,6 +91,7 @@ cd plann.er
 cd api-planner
 npm install
 cp .env.example .env
+# Configure JWT_SECRET no .env
 npm run db:migrate
 npm run dev
 ```
@@ -86,6 +106,7 @@ npm run dev
 ### 4. Acesse a aplicação
 - Frontend: http://localhost:5173
 - Backend: http://localhost:3333
+- **Primeiro acesso:** Crie uma conta na página de registro
 
 ## 📁 Estrutura de Pastas
 
@@ -93,21 +114,38 @@ Consulte os READMEs específicos para mais detalhes:
 - [Backend Documentation](./api-planner/README.md)
 - [Frontend Documentation](./front-planner/README.md)
 
-## 🔒 Segurança
+## 🔒 Autenticação e Segurança
 
-- Validação de entrada com Zod
-- Sanitização de dados
-- Variáveis de ambiente protegidas
-- CORS configurado adequadamente
-- Tratamento centralizado de erros
+- **JWT tokens** com refresh automático
+- **Middleware de proteção** em rotas sensíveis
+- **Hash de senhas** com bcrypt
+- **Validação de entrada** com Zod
+- **Controle de permissões** baseado em roles
+- **Sanitização de dados**
+- **CORS configurado** adequadamente
+- **Tratamento centralizado** de erros
+
+## 👥 Sistema de Permissões
+
+- **Proprietário da viagem:**
+  - Pode editar informações da viagem
+  - Pode remover participantes
+  - Pode editar/excluir qualquer atividade ou link
+  
+- **Participante:**
+  - Pode visualizar detalhes da viagem
+  - Pode criar atividades e links
+  - Pode editar/excluir apenas seus próprios itens
+  - Pode confirmar/desconfirmar apenas sua própria participação
 
 ## 📊 Banco de Dados
 
 O projeto utiliza SQLite com Prisma ORM, com as seguintes entidades:
+- **Users** - Usuários do sistema
 - **Trips** - Viagens
-- **Participants** - Participantes
-- **Activities** - Atividades
-- **Links** - Links importantes
+- **Participants** - Participantes (com referência ao usuário)
+- **Activities** - Atividades (com criador)
+- **Links** - Links importantes (com criador)
 
 ---
 
