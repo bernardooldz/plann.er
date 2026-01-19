@@ -6,9 +6,13 @@ import nodemailer from "nodemailer";
 import { getEmailClient } from "../lib/mail";
 import { ClientError } from "../errors/client-error";
 import { env } from "../env";
+import { authMiddleware } from "../lib/auth-middleware";
+import { tripOwnerMiddleware } from "../lib/trip-owner-middleware";
 
 export async function createInvite(app: FastifyInstance) {
-  app.post("/trips/:tripId/invites", async (request) => {
+  app.post("/trips/:tripId/invites", {
+    preHandler: [authMiddleware, tripOwnerMiddleware]
+  }, async (request) => {
     const getTripParamsSchema = z.object({
       tripId: z.string().uuid(),
     });

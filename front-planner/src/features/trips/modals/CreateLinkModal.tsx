@@ -34,7 +34,7 @@ export function CreateLinkModal({ closeCreateLinkModal }: CreateLinkModalProps) 
         message: 'O link foi adicionado com sucesso.'
       });
 
-      window.document.location.reload();
+      closeCreateLinkModal();
     } catch {
       addToast({
         type: 'error',
