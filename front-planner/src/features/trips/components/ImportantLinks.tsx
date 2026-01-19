@@ -18,7 +18,10 @@ interface Link {
   can_edit: boolean;
 }
 
-export function ImportantLinks({ openCreateLinkModal, refreshTrigger }: ImportantLinksProps) {
+export function ImportantLinks({
+  openCreateLinkModal,
+  refreshTrigger,
+}: ImportantLinksProps) {
   const { tripId } = useParams();
   const [links, setLinks] = useState<Link[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,14 +30,14 @@ export function ImportantLinks({ openCreateLinkModal, refreshTrigger }: Importan
 
   function loadLinks() {
     if (!tripId) return;
-    
+
     api
       .get(`/trips/${tripId}/links`)
       .then((response) => {
         setLinks(response.data.links || []);
       })
       .catch((error) => {
-        console.error('Erro ao carregar links:', error);
+        console.error("Erro ao carregar links:", error);
       })
       .finally(() => {
         setLoading(false);
@@ -66,8 +69,16 @@ export function ImportantLinks({ openCreateLinkModal, refreshTrigger }: Importan
   return (
     <>
       <div className="space-y-6">
-        <h2 className="text-xl font-semibold">Links importantes</h2>
-        
+        <div className="space-y-2">
+          <h2 className="text-xl font-semibold text-zinc-100">
+            Links importantes
+          </h2>
+          <p className="text-sm text-zinc-400 leading-relaxed -mt-2">
+            Organize links úteis para a viagem como reservas, mapas e
+            informações importantes.
+          </p>
+        </div>
+
         {loading ? (
           <div className="text-zinc-400">Carregando links...</div>
         ) : (
@@ -76,22 +87,29 @@ export function ImportantLinks({ openCreateLinkModal, refreshTrigger }: Importan
               links.map((link) => (
                 <div
                   key={link.id}
-                  className="flex items-center justify-between gap-4"
+                  className="flex items-center justify-between gap-4 p-3 rounded-lg bg-zinc-900/50 border border-zinc-800"
                 >
-                  <div className="space-y-1.5 flex-1">
+                  <div className="space-y-1 flex-1">
                     <span className="block font-medium text-zinc-100">
                       {link.title}
                     </span>
                     <a
                       href={link.url}
                       target="_blank"
-                      className="block text-xs text-zinc-400 truncate hover:text-zinc-200"
+                      className="block text-sm text-zinc-400 truncate hover:text-lime-200 transition-colors"
                     >
                       {link.url}
                     </a>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Link2 className="size-5 text-zinc-400 shrink-0" />
+                    <a
+                      className="p-2 text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800 rounded-lg transition-all"
+                      title="Abrir link"
+                      href={link.url}
+                    >
+                      <Link2 className="size-5 text-lime-400 shrink-0" />
+                    </a>
+
                     {link.can_edit && (
                       <>
                         <button
@@ -114,10 +132,10 @@ export function ImportantLinks({ openCreateLinkModal, refreshTrigger }: Importan
                 </div>
               ))
             ) : (
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-sm text-zinc-500">
-                  Ainda não há nenhum link cadastrado
-                </span>
+              <div className="text-center py-8">
+                <p className="text-sm text-zinc-400">
+                  Nenhum link foi cadastrado ainda.
+                </p>
               </div>
             )}
           </div>

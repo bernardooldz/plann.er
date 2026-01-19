@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Eye, EyeOff, LockKeyhole, Mail, User } from "lucide-react";
 import { Button, Input } from "../../../design-system";
 import { useAuth } from '../hooks/useAuth';
@@ -22,6 +22,8 @@ export function RegisterPage() {
 
   const { register } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const returnTo = searchParams.get('returnTo');
 
   const validateForm = () => {
     const newErrors = {

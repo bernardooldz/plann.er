@@ -14,6 +14,7 @@ import { useAuth } from '../hooks/useAuth';
 import { api } from "../../../shared/utils/api";
 import { dayjs } from "../../../shared/lib/dayjs";
 import { EditProfileModal } from "../modals/EditProfileModal";
+import { CreateTripModal } from "../../trips/modals/CreateTripModal";
 
 interface Trip {
   id: string;
@@ -37,6 +38,7 @@ export function DashboardPage() {
   });
   const [loading, setLoading] = useState(true);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isCreateTripModalOpen, setIsCreateTripModalOpen] = useState(false);
   const { user, logout } = useAuth();
 
   useEffect(() => {
@@ -84,12 +86,13 @@ export function DashboardPage() {
         <div className="flex-1 space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-3xl font-semibold">Minhas viagens</h2>
-            <Link to="/create-trip">
-              <button className="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400">
+            <button 
+              onClick={() => setIsCreateTripModalOpen(true)}
+              className="bg-lime-300 text-lime-950 rounded-lg px-5 py-2 font-medium flex items-center gap-2 hover:bg-lime-400"
+            >
                 <Plus className="size-5 text-lime-950" />
                 Nova viagem
               </button>
-            </Link>
           </div>
 
           <div className="space-y-6">
@@ -104,7 +107,7 @@ export function DashboardPage() {
                 const isOwner = trips.ownedTrips.some((t) => t.id === trip.id);
                 return (
                   <Link key={trip.id} to={`/trips/${trip.id}`}>
-                    <div className="bg-zinc-900 p-4 rounded-xl hover:bg-zinc-800 transition-colors shadow-shape">
+                    <div className="bg-zinc-900 p-4 rounded-xl hover:bg-zinc-800 transition-colors shadow-shape mb-3">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <MapPin className="size-5 text-zinc-400" />
@@ -168,7 +171,7 @@ export function DashboardPage() {
                 <div className="flex justify-between">
                   <span className="text-zinc-400">Membro desde:</span>
                   <span className="text-zinc-100">
-                    {dayjs().format("MMM/YYYY")}
+                    {dayjs().format("MMMM")} de {dayjs().format("YYYY")}
                   </span>
                 </div>
                 <div className="flex justify-between">
@@ -180,7 +183,7 @@ export function DashboardPage() {
                 <div className="flex justify-between">
                   <span className="text-zinc-400">Participando:</span>
                   <span className="text-zinc-100">
-                    {trips.participatingTrips.length}
+                    {trips.participatingTrips.length + trips.ownedTrips.length}
                   </span>
                 </div>
               </div>
@@ -200,6 +203,10 @@ export function DashboardPage() {
 
       {isEditModalOpen && (
         <EditProfileModal closeModal={() => setIsEditModalOpen(false)} />
+      )}
+
+      {isCreateTripModalOpen && (
+        <CreateTripModal closeCreateTripModal={() => setIsCreateTripModalOpen(false)} />
       )}
     </div>
   );

@@ -51,7 +51,7 @@ export const router = createBrowserRouter([
     element: <ProtectedRoute><TripDetailsPage /></ProtectedRoute>
   },
   {
-    path: '/participants/:participantId/confirm',
+    path: '/trips/:tripId/join',
     element: <ConfirmParticipantPage />
   }
 ])
