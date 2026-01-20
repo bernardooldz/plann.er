@@ -4,6 +4,7 @@ import { TripDetailsPage } from '../features/trips/pages/TripDetailsPage'
 import { ConfirmParticipantPage } from '../features/trips/pages/ConfirmParticipantPage'
 import { LoginPage, RegisterPage, DashboardPage } from '../features/auth'
 import { useAuth } from '../features/auth'
+import { LandingPage } from '../pages/landing'
 
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth()
@@ -28,7 +29,11 @@ function PublicRoute({ children }: { children: React.ReactNode }) {
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <Navigate to="/dashboard" />
+    element: <LandingPage />
+  },
+  {
+    path: '/home',
+    element: <LandingPage />
   },
   {
     path: '/login',
